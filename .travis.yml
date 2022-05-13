@@ -1,0 +1,8 @@
+language: java
+jdk:
+  - openjdk17
+script:
+  - mvn clean install
+cache:
+  directories:
+    - $HOME/.m2
