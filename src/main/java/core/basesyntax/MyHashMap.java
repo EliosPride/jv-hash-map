@@ -13,7 +13,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private final static float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] nodeArray;
     private int size;
-    int threshold;
+    private int threshold;
 
     public MyHashMap() {
         this.nodeArray = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
@@ -59,7 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void reSize() {
         int newArraySize = nodeArray.length * 2;
         Node<K, V>[] newNodeArray = (Node<K, V>[]) new Node[newArraySize];
-        calculateThreshold(newArraySize);
+        threshold = calculateThreshold(newArraySize);
         size = 0;
         Node<K, V>[] oldNodeArray = nodeArray;
         nodeArray = newNodeArray;
@@ -113,8 +113,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int calculateThreshold(int size) {
-        threshold = (int) (size * LOAD_FACTOR);
-        return threshold;
+        return (int) (size * LOAD_FACTOR);
     }
 
     private int hash(K key) {
