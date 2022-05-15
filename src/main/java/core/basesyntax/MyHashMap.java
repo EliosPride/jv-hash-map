@@ -32,15 +32,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (size == 0) {
+        newArrayIndex = findIndex(key);
+        Node<K, V> nodeWithNewIndex = nodeArray[newArrayIndex];
+        if (Objects.isNull(nodeWithNewIndex)) {
             return null;
         }
-        newArrayIndex = findIndex(key);
-        if (Objects.equals(nodeArray[newArrayIndex].key, key)) {
-            return nodeArray[newArrayIndex].value;
+        if (Objects.equals(nodeWithNewIndex.key, key)) {
+            return nodeWithNewIndex.value;
         }
-        if (Objects.nonNull(nodeArray[newArrayIndex].next)) {
-            Node<K, V> nextKey = nodeArray[newArrayIndex].next;
+        if (Objects.nonNull(nodeWithNewIndex.next)) {
+            Node<K, V> nextKey = nodeWithNewIndex.next;
             while (nextKey != null) {
                 if (Objects.equals(nextKey.key, key)) {
                     return nextKey.value;
