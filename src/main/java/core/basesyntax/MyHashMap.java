@@ -55,8 +55,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public boolean isEmpty(int arrayIndex) {
+    private boolean isEmpty(int arrayIndex) {
         return Objects.equals(keyArray[arrayIndex], null);
     }
 
@@ -93,7 +92,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return Math.abs(key.hashCode() % keyArray.length);
     }
 
-    public void addNewNode(K key, V value, int arrayIndex) {
+    private void addNewNode(K key, V value, int arrayIndex) {
 
         if (isEmpty(arrayIndex)) {
             if (Objects.isNull(key)) {
@@ -139,13 +138,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    public class Node<K, V> {
+    private class Node<K, V> {
         private K key;
         private V value;
         private int hash;
         private Node<K, V> next;
 
-        public Node(K keySet, V valueSet, int hash, Node<K, V> next) {
+        private Node(K keySet, V valueSet, int hash, Node<K, V> next) {
             this.key = keySet;
             this.value = valueSet;
             this.hash = hash;
