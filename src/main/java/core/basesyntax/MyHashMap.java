@@ -9,16 +9,15 @@ import java.util.Objects;
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
-    private Node<K, V>[] nodeArray;
-    private int size;
     private final static int DEFAULT_CAPACITY = 16;
     private final static float LOAD_FACTOR = 0.75f;
-    private int threshold;
-    private int newArrayIndex;
+    private Node<K, V>[] nodeArray;
+    private int size;
+    int threshold;
 
     public MyHashMap() {
         this.nodeArray = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
-        this.threshold = thresholdCalculation(nodeArray.length);
+        this.threshold = calculateThreshold(nodeArray.length);
     }
 
     @Override
@@ -32,16 +31,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        newArrayIndex = findIndex(key);
-        Node<K, V> nodeWithNewIndex = nodeArray[newArrayIndex];
-        if (Objects.isNull(nodeWithNewIndex)) {
+        int nodeIndex = findIndex(key);
+        Node<K, V> existedNode = nodeArray[nodeIndex];
+        if (Objects.isNull(existedNode)) {
             return null;
         }
-        if (Objects.equals(nodeWithNewIndex.key, key)) {
-            return nodeWithNewIndex.value;
+        if (Objects.equals(existedNode.key, key)) {
+            return existedNode.value;
         }
-        if (Objects.nonNull(nodeWithNewIndex.next)) {
-            Node<K, V> nextKey = nodeWithNewIndex.next;
+        if (Objects.nonNull(existedNode.next)) {
+            Node<K, V> nextKey = existedNode.next;
             while (nextKey != null) {
                 if (Objects.equals(nextKey.key, key)) {
                     return nextKey.value;
@@ -57,21 +56,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private boolean isEmpty(int arrayIndex) {
-        return Objects.isNull(nodeArray[arrayIndex]);
-    }
-
     private void reSize() {
         int newArraySize = nodeArray.length * 2;
         Node<K, V>[] newNodeArray = (Node<K, V>[]) new Node[newArraySize];
-        thresholdCalculation(newArraySize);
+        calculateThreshold(newArraySize);
         size = 0;
         Node<K, V>[] oldNodeArray = nodeArray;
         nodeArray = newNodeArray;
         for (Node<K, V> oldNode : oldNodeArray) {
             if (Objects.nonNull(oldNode)) {
-                newArrayIndex = findIndex(oldNode.key);
-                addNewNode(oldNode.key, oldNode.value, newArrayIndex);
+                int nodeIndex = findIndex(oldNode.key);
+                addNewNode(oldNode.key, oldNode.value, nodeIndex);
                 Node<K, V> nextNode = oldNode.next;
                 while (nextNode != null) {
                     int newNodeIndex = findIndex(nextNode.key);
@@ -87,30 +82,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void addNewNode(K key, V value, int arrayIndex) {
-        Node<K, V> nodeByIndex = nodeArray[arrayIndex];
-        if (isEmpty(arrayIndex)) {
-            if (Objects.isNull(key)) {
-                nodeArray[arrayIndex] = new Node<>(null, value, 0, null);
-                size++;
-                return;
-            }
+        Node<K, V> existedNode = nodeArray[arrayIndex];
+        if (Objects.isNull(nodeArray[arrayIndex])) {
             nodeArray[arrayIndex] = new Node<>(key, value, hash(key), null);
             size++;
             return;
         }
-        if (Objects.equals(nodeByIndex.key, key)) {
-            nodeByIndex.value = value;
+        if (Objects.equals(existedNode.key, key)) {
+            existedNode.value = value;
             return;
         }
-        Node<K, V> nextNode = nodeByIndex.next;
+        Node<K, V> nextNode = existedNode.next;
         do {
             if (Objects.isNull(nextNode)) {
-                if (Objects.isNull(key)) {
-                    nodeByIndex.next = new Node<>(null, value, 0, null);
-                    size++;
-                    return;
-                }
-                nodeByIndex.next = new Node<>(key, value, hash(key), null);
+                existedNode.next = new Node<>(key, value, hash(key), null);
                 size++;
                 return;
             }
@@ -119,11 +104,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             }
             if (Objects.isNull(nextNode.next)) {
-                if (Objects.isNull(key)) {
-                    nextNode.next = new Node<>(null, value, 0, null);
-                    size++;
-                    return;
-                }
                 nextNode.next = new Node<>(key, value, hash(key), null);
                 size++;
                 return;
@@ -132,8 +112,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } while (true);
     }
 
-    private int thresholdCalculation(int ArraySize) {
-        return threshold = (int) (ArraySize * LOAD_FACTOR);
+    private int calculateThreshold(int size) {
+        threshold = (int) (size * LOAD_FACTOR);
+        return threshold;
     }
 
     private int hash(K key) {
